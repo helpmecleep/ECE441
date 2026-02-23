@@ -9,17 +9,31 @@ entity booth_multiplier is
 end booth_multiplier;
 
 architecture behavioural of booth_multiplier is
-    signal A, B, Bn: signed(7 downto 0);
-    signal P: signed(15 downto 0);
-
+    type partial_product_array is array (0 to 7) of signed(15 downto 0);
 begin 
 process(a, b)
+    variable sum : signed(15 downto 0);
+    variable Bn  : partial_product_array;
 begin
-    for i in 0 to 7 loop
-        elsif B(i) < B(i-1) then
-            Bn(i) <= A;
-        elsif B(i) > B(i-1) then
-            Bn(i) <= -A;
+    if b(0) = '1' then
+    Bn(0) := shift_left(resize(-signed(a), 16), 0);
+    else
+        Bn(0) := (others => '0');
+    end if;
+    for i in 1 to 7 loop
+        if b(i) < b(i-1) then
+            Bn(i) := shift_left(resize(signed(a), 16), i);
+        elsif b(i) > b(i-1) then
+            Bn(i) := shift_left(resize(-signed(a), 16), i);
         else
-            Bn(i) = (others => '0');
+            Bn(i) := (others => '0');
+        end if;
     end loop;
+    sum := (others => '0');
+    for i in 0 to 7 loop
+        sum := sum + Bn(i);
+    end loop;
+    p <= std_logic_vector(sum);
+
+end process;
+end behavioural;
