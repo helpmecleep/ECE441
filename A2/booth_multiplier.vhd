@@ -21,9 +21,9 @@ begin
         Bn(0) := (others => '0');
     end if;
     for i in 1 to 7 loop
-        if b(i) < b(i-1) then
+        if b(i) = '0' and b(i-1) = '1' then
             Bn(i) := shift_left(resize(signed(a), 16), i);
-        elsif b(i) > b(i-1) then
+        elsif b(i) = '1' and  b(i-1) = '0' then
             Bn(i) := shift_left(resize(-signed(a), 16), i);
         else
             Bn(i) := (others => '0');
